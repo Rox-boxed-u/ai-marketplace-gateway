@@ -34,7 +34,7 @@ app.get('/health', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Gateway running on port ${PORT}`);
     console.log(`🌐 Open http://localhost:${PORT} in your browser`);
 });

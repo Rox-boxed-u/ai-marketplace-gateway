@@ -1,21 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Marketplace Gateway</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Arabic', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            transition: direction 0.3s ease;
+        }
+
+        /* RTL Support */
+        [dir="rtl"] {
+            text-align: right;
+        }
+
+        [dir="rtl"] .header-content {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .test-section {
+            direction: rtl;
+        }
+
+        [dir="rtl"] .language-selector {
+            left: auto;
+            right: 20px;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -26,17 +49,94 @@
         header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 40px;
-            text-align: center;
+            padding: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            flex: 1;
         }
         
-        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* Language Selector */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: white;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            transition: width 0.3s ease;
+            width: 60px;
+            overflow: hidden;
+        }
+
+        .language-selector:hover {
+            width: auto;
+        }
+
+        .current-flag {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            background: #f0f0f0;
+        }
+
+        .language-options {
+            display: none;
+            padding: 0 10px;
+        }
+
+        .language-selector:hover .language-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-option {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f8f8;
+        }
+
+        .lang-option:hover {
+            background: #e0e0e0;
+            transform: scale(1.1);
+        }
+        
+        .content {
+            padding: 40px;
+        }
         
         .services {
-            padding: 40px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 30px;
+            margin-top: 30px;
         }
         
         .service-card {
@@ -44,6 +144,7 @@
             border-radius: 12px;
             padding: 25px;
             transition: all 0.3s ease;
+            background: white;
         }
         
         .service-card:hover {
@@ -51,110 +152,608 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             border-color: #667eea;
         }
-        
-        button {
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .service-icon {
+            font-size: 2rem;
+        }
+
+        .service-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .service-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* Test Sections */
+        .test-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .test-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
             background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .test-section {
+            display: none;
+        }
+
+        .test-section.active {
+            display: block;
+        }
+
+        .test-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Arabic', sans-serif;
+        }
+
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
+            border-radius: 8px;
             font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
             width: 100%;
-            margin-top: 15px;
+            margin-bottom: 15px;
         }
         
-        button:hover {
-            background: #764ba2;
+        .test-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .test-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
         
-        .output {
-            margin-top: 15px;
+        .output-area {
             padding: 15px;
-            background: #f5f8fa;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 12px;
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            min-height: 120px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-word;
             display: none;
         }
         
-        .output.show { display: block; }
+        .output-area.show {
+            display: block;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #10b981;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .status-badge.coming-soon {
+            background: #f59e0b;
+        }
+
+        @media (max-width: 768px) {
+            .services {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .language-selector {
+                top: 10px;
+                left: 10px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <div class="current-flag" id="currentFlag">🇬🇧</div>
+        <div class="language-options">
+            <div class="lang-option" data-lang="en-GB" data-flag="🇬🇧" title="English (UK)">🇬🇧</div>
+            <div class="lang-option" data-lang="en-US" data-flag="🇺🇸" title="English (US)">🇺🇸</div>
+            <div class="lang-option" data-lang="ar" data-flag="🇸🇦" title="العربية">🇸🇦</div>
+            <div class="lang-option" data-lang="es" data-flag="🇪🇸" title="Español">🇪🇸</div>
+            <div class="lang-option" data-lang="pt" data-flag="🇵🇹" title="Português">🇵🇹</div>
+            <div class="lang-option" data-lang="no" data-flag="🇳🇴" title="Norsk">🇳🇴</div>
+        </div>
+    </div>
+
     <div class="container">
         <header>
-            <h1>🚀 AI Marketplace Gateway</h1>
-            <p>Test your AI services in a secure sandbox</p>
+            <div class="header-content">
+                <div class="header-title">
+                    <h1 data-i18n="title">AI Marketplace Gateway</h1>
+                    <p data-i18n="subtitle">Test your AI services in a secure environment</p>
+                </div>
+            </div>
         </header>
         
-        <div class="services">
-            <div class="service-card">
-                <h3>📊 EPAE</h3>
-                <p>Enterprise Process Automation Engine</p>
-                <button onclick="testService('epae', this)">Test Service</button>
-                <div class="output" id="epae-output"></div>
-            </div>
-            
-            <div class="service-card">
-                <h3>✨ CREATE</h3>
-                <p>AI Content Generation Platform</p>
-                <button onclick="testService('create', this)">Test Service</button>
-                <div class="output" id="create-output"></div>
-            </div>
-            
-            <div class="service-card">
-                <h3>📈 Forecast</h3>
-                <p>Predictive Analytics System</p>
-                <button onclick="testService('forecast', this)">Test Service</button>
-                <div class="output" id="forecast-output"></div>
-            </div>
-            
-            <div class="service-card">
-                <h3>📄 Skanr</h3>
-                <p>Document Intelligence & OCR</p>
-                <button onclick="testService('skanr', this)">Test Service</button>
-                <div class="output" id="skanr-output"></div>
-            </div>
-            
-            <div class="service-card">
-                <h3>🔮 Futr</h3>
-                <p>Market Trends Analysis</p>
-                <button onclick="testService('futr', this)">Test Service</button>
-                <div class="output" id="futr-output"></div>
-            </div>
-            
-            <div class="service-card" style="opacity: 0.5;">
-                <h3>💰 Budee</h3>
-                <p>AI Budget Assistant (Coming Soon)</p>
-                <button disabled>Coming Soon</button>
+        <div class="content">
+            <div class="services">
+                <!-- EPAE Service -->
+                <div class="service-card">
+                    <span class="status-badge" data-i18n="status-active">Active</span>
+                    <div class="service-header">
+                        <span class="service-icon">📊</span>
+                        <h3 class="service-name">EPAE</h3>
+                    </div>
+                    <p class="service-description" data-i18n="epae-desc">Enterprise Process Automation Engine - Streamline workflows with AI</p>
+                    
+                    <div class="test-container">
+                        <div class="test-tabs">
+                            <button class="tab-button active" onclick="switchTab('epae', 'custom')" data-i18n="tab-custom">Custom Input</button>
+                            <button class="tab-button" onclick="switchTab('epae', 'raw')" data-i18n="tab-raw">Raw API Test</button>
+                        </div>
+                        
+                        <div class="test-section active" id="epae-custom">
+                            <textarea class="test-input" id="epae-custom-input" placeholder="Enter your workflow data..." data-i18n-placeholder="input-workflow"></textarea>
+                            <button class="test-button" onclick="testService('epae', 'custom')">
+                                <span data-i18n="test-button">Run Test</span>
+                            </button>
+                            <div class="output-area" id="epae-custom-output"></div>
+                        </div>
+                        
+                        <div class="test-section" id="epae-raw">
+                            <button class="test-button" onclick="testService('epae', 'raw')">
+                                <span data-i18n="test-raw">Test Raw API Response</span>
+                            </button>
+                            <div class="output-area" id="epae-raw-output"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CREATE Service -->
+                <div class="service-card">
+                    <span class="status-badge" data-i18n="status-active">Active</span>
+                    <div class="service-header">
+                        <span class="service-icon">✨</span>
+                        <h3 class="service-name">CREATE</h3>
+                    </div>
+                    <p class="service-description" data-i18n="create-desc">AI Content Generation Platform - Create marketing content instantly</p>
+                    
+                    <div class="test-container">
+                        <div class="test-tabs">
+                            <button class="tab-button active" onclick="switchTab('create', 'custom')" data-i18n="tab-custom">Custom Input</button>
+                            <button class="tab-button" onclick="switchTab('create', 'raw')" data-i18n="tab-raw">Raw API Test</button>
+                        </div>
+                        
+                        <div class="test-section active" id="create-custom">
+                            <textarea class="test-input" id="create-custom-input" placeholder="Describe what content you want to generate..." data-i18n-placeholder="input-content"></textarea>
+                            <button class="test-button" onclick="testService('create', 'custom')">
+                                <span data-i18n="test-button">Run Test</span>
+                            </button>
+                            <div class="output-area" id="create-custom-output"></div>
+                        </div>
+                        
+                        <div class="test-section" id="create-raw">
+                            <button class="test-button" onclick="testService('create', 'raw')">
+                                <span data-i18n="test-raw">Test Raw API Response</span>
+                            </button>
+                            <div class="output-area" id="create-raw-output"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forecast Service -->
+                <div class="service-card">
+                    <span class="status-badge" data-i18n="status-active">Active</span>
+                    <div class="service-header">
+                        <span class="service-icon">📈</span>
+                        <h3 class="service-name">Forecast</h3>
+                    </div>
+                    <p class="service-description" data-i18n="forecast-desc">Predictive Analytics - Advanced forecasting for decision making</p>
+                    
+                    <div class="test-container">
+                        <div class="test-tabs">
+                            <button class="tab-button active" onclick="switchTab('forecast', 'custom')" data-i18n="tab-custom">Custom Input</button>
+                            <button class="tab-button" onclick="switchTab('forecast', 'raw')" data-i18n="tab-raw">Raw API Test</button>
+                        </div>
+                        
+                        <div class="test-section active" id="forecast-custom">
+                            <textarea class="test-input" id="forecast-custom-input" placeholder="Enter historical data for forecasting..." data-i18n-placeholder="input-forecast"></textarea>
+                            <button class="test-button" onclick="testService('forecast', 'custom')">
+                                <span data-i18n="test-button">Run Test</span>
+                            </button>
+                            <div class="output-area" id="forecast-custom-output"></div>
+                        </div>
+                        
+                        <div class="test-section" id="forecast-raw">
+                            <button class="test-button" onclick="testService('forecast', 'raw')">
+                                <span data-i18n="test-raw">Test Raw API Response</span>
+                            </button>
+                            <div class="output-area" id="forecast-raw-output"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skanr Service -->
+                <div class="service-card">
+                    <span class="status-badge" data-i18n="status-active">Active</span>
+                    <div class="service-header">
+                        <span class="service-icon">📄</span>
+                        <h3 class="service-name">Skanr</h3>
+                    </div>
+                    <p class="service-description" data-i18n="skanr-desc">Document Intelligence - Extract data from any document</p>
+                    
+                    <div class="test-container">
+                        <div class="test-tabs">
+                            <button class="tab-button active" onclick="switchTab('skanr', 'custom')" data-i18n="tab-custom">Custom Input</button>
+                            <button class="tab-button" onclick="switchTab('skanr', 'raw')" data-i18n="tab-raw">Raw API Test</button>
+                        </div>
+                        
+                        <div class="test-section active" id="skanr-custom">
+                            <textarea class="test-input" id="skanr-custom-input" placeholder="Paste document text to extract data..." data-i18n-placeholder="input-document"></textarea>
+                            <button class="test-button" onclick="testService('skanr', 'custom')">
+                                <span data-i18n="test-button">Run Test</span>
+                            </button>
+                            <div class="output-area" id="skanr-custom-output"></div>
+                        </div>
+                        
+                        <div class="test-section" id="skanr-raw">
+                            <button class="test-button" onclick="testService('skanr', 'raw')">
+                                <span data-i18n="test-raw">Test Raw API Response</span>
+                            </button>
+                            <div class="output-area" id="skanr-raw-output"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Futr Service -->
+                <div class="service-card">
+                    <span class="status-badge" data-i18n="status-active">Active</span>
+                    <div class="service-header">
+                        <span class="service-icon">🔮</span>
+                        <h3 class="service-name">Futr</h3>
+                    </div>
+                    <p class="service-description" data-i18n="futr-desc">Future Trends Analysis - Market intelligence platform</p>
+                    
+                    <div class="test-container">
+                        <div class="test-tabs">
+                            <button class="tab-button active" onclick="switchTab('futr', 'custom')" data-i18n="tab-custom">Custom Input</button>
+                            <button class="tab-button" onclick="switchTab('futr', 'raw')" data-i18n="tab-raw">Raw API Test</button>
+                        </div>
+                        
+                        <div class="test-section active" id="futr-custom">
+                            <textarea class="test-input" id="futr-custom-input" placeholder="Enter market or industry to analyse..." data-i18n-placeholder="input-market"></textarea>
+                            <button class="test-button" onclick="testService('futr', 'custom')">
+                                <span data-i18n="test-button">Run Test</span>
+                            </button>
+                            <div class="output-area" id="futr-custom-output"></div>
+                        </div>
+                        
+                        <div class="test-section" id="futr-raw">
+                            <button class="test-button" onclick="testService('futr', 'raw')">
+                                <span data-i18n="test-raw">Test Raw API Response</span>
+                            </button>
+                            <div class="output-area" id="futr-raw-output"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budee Service (Coming Soon) -->
+                <div class="service-card" style="opacity: 0.6;">
+                    <span class="status-badge coming-soon" data-i18n="status-coming">Coming Soon</span>
+                    <div class="service-header">
+                        <span class="service-icon">💰</span>
+                        <h3 class="service-name">Budee</h3>
+                    </div>
+                    <p class="service-description" data-i18n="budee-desc">AI Budget Assistant - Smart financial planning (Under Development)</p>
+                    
+                    <div class="test-container" style="pointer-events: none;">
+                        <button class="test-button" disabled>
+                            <span data-i18n="coming-soon">Coming Soon</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
     <script>
-        async function testService(service, button) {
+        // Translations
+        const translations = {
+            'en-GB': {
+                'title': 'AI Marketplace Gateway',
+                'subtitle': 'Test your AI services in a secure environment',
+                'status-active': 'Active',
+                'status-coming': 'Coming Soon',
+                'tab-custom': 'Custom Input',
+                'tab-raw': 'Raw API Test',
+                'test-button': 'Run Test',
+                'test-raw': 'Test Raw API Response',
+                'coming-soon': 'Coming Soon',
+                'epae-desc': 'Enterprise Process Automation Engine - Streamline workflows with AI',
+                'create-desc': 'AI Content Generation Platform - Create marketing content instantly',
+                'forecast-desc': 'Predictive Analytics - Advanced forecasting for decision making',
+                'skanr-desc': 'Document Intelligence - Extract data from any document',
+                'futr-desc': 'Future Trends Analysis - Market intelligence platform',
+                'budee-desc': 'AI Budget Assistant - Smart financial planning (Under Development)',
+                'input-workflow': 'Enter your workflow data...',
+                'input-content': 'Describe what content you want to generate...',
+                'input-forecast': 'Enter historical data for forecasting...',
+                'input-document': 'Paste document text to extract data...',
+                'input-market': 'Enter market or industry to analyse...'
+            },
+            'en-US': {
+                'title': 'AI Marketplace Gateway',
+                'subtitle': 'Test your AI services in a secure environment',
+                'status-active': 'Active',
+                'status-coming': 'Coming Soon',
+                'tab-custom': 'Custom Input',
+                'tab-raw': 'Raw API Test',
+                'test-button': 'Run Test',
+                'test-raw': 'Test Raw API Response',
+                'coming-soon': 'Coming Soon',
+                'epae-desc': 'Enterprise Process Automation Engine - Streamline workflows with AI',
+                'create-desc': 'AI Content Generation Platform - Create marketing content instantly',
+                'forecast-desc': 'Predictive Analytics - Advanced forecasting for decision making',
+                'skanr-desc': 'Document Intelligence - Extract data from any document',
+                'futr-desc': 'Future Trends Analysis - Market intelligence platform',
+                'budee-desc': 'AI Budget Assistant - Smart financial planning (Under Development)',
+                'input-workflow': 'Enter your workflow data...',
+                'input-content': 'Describe what content you want to generate...',
+                'input-forecast': 'Enter historical data for forecasting...',
+                'input-document': 'Paste document text to extract data...',
+                'input-market': 'Enter market or industry to analyze...'
+            },
+            'ar': {
+                'title': 'بوابة سوق الذكاء الاصطناعي',
+                'subtitle': 'اختبر خدمات الذكاء الاصطناعي في بيئة آمنة',
+                'status-active': 'نشط',
+                'status-coming': 'قريباً',
+                'tab-custom': 'إدخال مخصص',
+                'tab-raw': 'اختبار API الخام',
+                'test-button': 'تشغيل الاختبار',
+                'test-raw': 'اختبار استجابة API الخام',
+                'coming-soon': 'قريباً',
+                'epae-desc': 'محرك أتمتة العمليات المؤسسية - تبسيط سير العمل بالذكاء الاصطناعي',
+                'create-desc': 'منصة توليد المحتوى بالذكاء الاصطناعي - إنشاء محتوى تسويقي فوراً',
+                'forecast-desc': 'التحليلات التنبؤية - توقعات متقدمة لاتخاذ القرار',
+                'skanr-desc': 'ذكاء المستندات - استخراج البيانات من أي مستند',
+                'futr-desc': 'تحليل الاتجاهات المستقبلية - منصة ذكاء السوق',
+                'budee-desc': 'مساعد الميزانية بالذكاء الاصطناعي - التخطيط المالي الذكي (قيد التطوير)',
+                'input-workflow': 'أدخل بيانات سير العمل الخاصة بك...',
+                'input-content': 'صف المحتوى الذي تريد إنشاءه...',
+                'input-forecast': 'أدخل البيانات التاريخية للتنبؤ...',
+                'input-document': 'الصق نص المستند لاستخراج البيانات...',
+                'input-market': 'أدخل السوق أو الصناعة للتحليل...'
+            },
+            'es': {
+                'title': 'Portal del Mercado de IA',
+                'subtitle': 'Prueba tus servicios de IA en un entorno seguro',
+                'status-active': 'Activo',
+                'status-coming': 'Próximamente',
+                'tab-custom': 'Entrada Personalizada',
+                'tab-raw': 'Prueba API Raw',
+                'test-button': 'Ejecutar Prueba',
+                'test-raw': 'Probar Respuesta API Raw',
+                'coming-soon': 'Próximamente',
+                'epae-desc': 'Motor de Automatización de Procesos Empresariales - Optimiza flujos con IA',
+                'create-desc': 'Plataforma de Generación de Contenido con IA - Crea contenido de marketing al instante',
+                'forecast-desc': 'Análisis Predictivo - Pronósticos avanzados para la toma de decisiones',
+                'skanr-desc': 'Inteligencia Documental - Extrae datos de cualquier documento',
+                'futr-desc': 'Análisis de Tendencias Futuras - Plataforma de inteligencia de mercado',
+                'budee-desc': 'Asistente de Presupuesto con IA - Planificación financiera inteligente (En Desarrollo)',
+                'input-workflow': 'Ingrese sus datos de flujo de trabajo...',
+                'input-content': 'Describa qué contenido desea generar...',
+                'input-forecast': 'Ingrese datos históricos para pronosticar...',
+                'input-document': 'Pegue el texto del documento para extraer datos...',
+                'input-market': 'Ingrese el mercado o industria para analizar...'
+            },
+            'pt': {
+                'title': 'Portal do Mercado de IA',
+                'subtitle': 'Teste seus serviços de IA em um ambiente seguro',
+                'status-active': 'Ativo',
+                'status-coming': 'Em Breve',
+                'tab-custom': 'Entrada Personalizada',
+                'tab-raw': 'Teste API Raw',
+                'test-button': 'Executar Teste',
+                'test-raw': 'Testar Resposta API Raw',
+                'coming-soon': 'Em Breve',
+                'epae-desc': 'Motor de Automação de Processos Empresariais - Otimize fluxos com IA',
+                'create-desc': 'Plataforma de Geração de Conteúdo com IA - Crie conteúdo de marketing instantaneamente',
+                'forecast-desc': 'Análise Preditiva - Previsões avançadas para tomada de decisão',
+                'skanr-desc': 'Inteligência Documental - Extraia dados de qualquer documento',
+                'futr-desc': 'Análise de Tendências Futuras - Plataforma de inteligência de mercado',
+                'budee-desc': 'Assistente de Orçamento com IA - Planejamento financeiro inteligente (Em Desenvolvimento)',
+                'input-workflow': 'Insira seus dados de fluxo de trabalho...',
+                'input-content': 'Descreva que conteúdo deseja gerar...',
+                'input-forecast': 'Insira dados históricos para previsão...',
+                'input-document': 'Cole o texto do documento para extrair dados...',
+                'input-market': 'Insira o mercado ou indústria para analisar...'
+            },
+            'no': {
+                'title': 'AI Markedsplass Portal',
+                'subtitle': 'Test dine AI-tjenester i et sikkert miljø',
+                'status-active': 'Aktiv',
+                'status-coming': 'Kommer Snart',
+                'tab-custom': 'Tilpasset Input',
+                'tab-raw': 'Rå API Test',
+                'test-button': 'Kjør Test',
+                'test-raw': 'Test Rå API Respons',
+                'coming-soon': 'Kommer Snart',
+                'epae-desc': 'Enterprise Prosessautomatiseringsmotor - Strømlinjeforme arbeidsflyter med AI',
+                'create-desc': 'AI Innholdsgenerering Plattform - Lag markedsføringsinnhold umiddelbart',
+                'forecast-desc': 'Prediktiv Analyse - Avanserte prognoser for beslutningstaking',
+                'skanr-desc': 'Dokumentintelligens - Trekk ut data fra ethvert dokument',
+                'futr-desc': 'Fremtidige Trender Analyse - Markedsintelligens plattform',
+                'budee-desc': 'AI Budsjettassistent - Smart økonomisk planlegging (Under Utvikling)',
+                'input-workflow': 'Skriv inn dine arbeidsflytdata...',
+                'input-content': 'Beskriv hvilket innhold du vil generere...',
+                'input-forecast': 'Skriv inn historiske data for prognoser...',
+                'input-document': 'Lim inn dokumenttekst for å trekke ut data...',
+                'input-market': 'Skriv inn marked eller industri for analyse...'
+            }
+        };
+
+        let currentLang = 'en-GB';
+
+        // Language switching
+        document.querySelectorAll('.lang-option').forEach(option => {
+            option.addEventListener('click', function() {
+                currentLang = this.dataset.lang;
+                const flag = this.dataset.flag;
+                document.getElementById('currentFlag').textContent = flag;
+                
+                // Update HTML lang and dir attributes
+                document.documentElement.lang = currentLang;
+                document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+                document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+                
+                updateTranslations();
+            });
+        });
+
+        function updateTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[currentLang] && translations[currentLang][key]) {
+                    element.textContent = translations[currentLang][key];
+                }
+            });
+            
+            // Update placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (translations[currentLang] && translations[currentLang][key]) {
+                    element.placeholder = translations[currentLang][key];
+                }
+            });
+        }
+
+        // Tab switching
+        function switchTab(service, tab) {
+            // Update buttons
+            document.querySelectorAll(`#${service}-custom, #${service}-raw`).forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`${service}-${tab}`).classList.add('active');
+            
+            // Update tab buttons
+            const container = document.getElementById(`${service}-${tab}`).parentElement;
+            container.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Test service function
+        async function testService(service, type) {
+            const button = event.target.closest('button');
+            const outputEl = document.getElementById(`${service}-${type}-output`);
+            
             button.disabled = true;
-            button.textContent = 'Testing...';
+            const originalText = button.innerHTML;
+            button.innerHTML = '<span class="loading"></span> Processing...';
             
             try {
+                let input = '';
+                
+                if (type === 'custom') {
+                    input = document.getElementById(`${service}-custom-input`).value;
+                    if (!input.trim()) {
+                        throw new Error('Please enter test data');
+                    }
+                } else {
+                    input = 'RAW_API_TEST';
+                }
+                
                 const response = await fetch(`/api/service/${service}`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ input: 'Test input data' })
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        input: input,
+                        type: type,
+                        lang: currentLang
+                    })
                 });
                 
                 const data = await response.json();
-                const output = document.getElementById(`${service}-output`);
-                output.textContent = JSON.stringify(data, null, 2);
-                output.classList.add('show');
+                
+                outputEl.classList.add('show');
+                outputEl.textContent = JSON.stringify(data, null, 2);
+                
             } catch (error) {
-                alert('Error: ' + error.message);
+                outputEl.classList.add('show');
+                outputEl.textContent = 'Error: ' + error.message;
             } finally {
                 button.disabled = false;
-                button.textContent = 'Test Service';
+                button.innerHTML = originalText;
             }
         }
+
+        // Initialize
+        updateTranslations();
     </script>
 </body>
 </html>
